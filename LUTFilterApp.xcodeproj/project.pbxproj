@@ -9,8 +9,7 @@
 /* Begin PBXBuildFile section */
 		36F52C0A2BA2F9F8004FB7C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C092BA2F9F8004FB7C3 /* AppDelegate.swift */; };
 		36F52C0C2BA2F9F8004FB7C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C0B2BA2F9F8004FB7C3 /* SceneDelegate.swift */; };
-		36F52C0E2BA2F9F8004FB7C3 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C0D2BA2F9F8004FB7C3 /* ViewController.swift */; };
-		36F52C112BA2F9F8004FB7C3 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36F52C0F2BA2F9F8004FB7C3 /* Main.storyboard */; };
+		36F52C0E2BA2F9F8004FB7C3 /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C0D2BA2F9F8004FB7C3 /* FilterViewController.swift */; };
 		36F52C132BA2F9FB004FB7C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36F52C122BA2F9FB004FB7C3 /* Assets.xcassets */; };
 		36F52C162BA2F9FB004FB7C3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 36F52C142BA2F9FB004FB7C3 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -19,8 +18,7 @@
 		36F52C062BA2F9F8004FB7C3 /* LUTFilterApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LUTFilterApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F52C092BA2F9F8004FB7C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36F52C0B2BA2F9F8004FB7C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		36F52C0D2BA2F9F8004FB7C3 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		36F52C102BA2F9F8004FB7C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		36F52C0D2BA2F9F8004FB7C3 /* FilterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterViewController.swift; sourceTree = "<group>"; };
 		36F52C122BA2F9FB004FB7C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		36F52C152BA2F9FB004FB7C3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		36F52C172BA2F9FB004FB7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -56,15 +54,30 @@
 		36F52C082BA2F9F8004FB7C3 /* LUTFilterApp */ = {
 			isa = PBXGroup;
 			children = (
-				36F52C092BA2F9F8004FB7C3 /* AppDelegate.swift */,
-				36F52C0B2BA2F9F8004FB7C3 /* SceneDelegate.swift */,
-				36F52C0D2BA2F9F8004FB7C3 /* ViewController.swift */,
-				36F52C0F2BA2F9F8004FB7C3 /* Main.storyboard */,
-				36F52C122BA2F9FB004FB7C3 /* Assets.xcassets */,
-				36F52C142BA2F9FB004FB7C3 /* LaunchScreen.storyboard */,
+				36F52C1E2BA2FB7F004FB7C3 /* Resources */,
+				36F52C1D2BA2FB6D004FB7C3 /* Controllers */,
 				36F52C172BA2F9FB004FB7C3 /* Info.plist */,
 			);
 			path = LUTFilterApp;
+			sourceTree = "<group>";
+		};
+		36F52C1D2BA2FB6D004FB7C3 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				36F52C0D2BA2F9F8004FB7C3 /* FilterViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		36F52C1E2BA2FB7F004FB7C3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				36F52C142BA2F9FB004FB7C3 /* LaunchScreen.storyboard */,
+				36F52C122BA2F9FB004FB7C3 /* Assets.xcassets */,
+				36F52C092BA2F9F8004FB7C3 /* AppDelegate.swift */,
+				36F52C0B2BA2F9F8004FB7C3 /* SceneDelegate.swift */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -127,7 +140,6 @@
 			files = (
 				36F52C162BA2F9FB004FB7C3 /* LaunchScreen.storyboard in Resources */,
 				36F52C132BA2F9FB004FB7C3 /* Assets.xcassets in Resources */,
-				36F52C112BA2F9F8004FB7C3 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -138,7 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				36F52C0E2BA2F9F8004FB7C3 /* ViewController.swift in Sources */,
+				36F52C0E2BA2F9F8004FB7C3 /* FilterViewController.swift in Sources */,
 				36F52C0A2BA2F9F8004FB7C3 /* AppDelegate.swift in Sources */,
 				36F52C0C2BA2F9F8004FB7C3 /* SceneDelegate.swift in Sources */,
 			);
@@ -147,14 +159,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		36F52C0F2BA2F9F8004FB7C3 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				36F52C102BA2F9F8004FB7C3 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		36F52C142BA2F9FB004FB7C3 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -297,9 +301,9 @@
 				INFOPLIST_FILE = LUTFilterApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -307,6 +311,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jellybus.LUTFilterApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -325,9 +333,9 @@
 				INFOPLIST_FILE = LUTFilterApp/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -335,6 +343,10 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jellybus.LUTFilterApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
