@@ -1,13 +1,10 @@
-//
-//  ViewController.swift
-//  LUTFilterApp
-//
-//  Created by jellybus on 3/14/24.
-//
-
 import UIKit
 
 class FilterViewController: UIViewController {
+    var srcImage: UIImage?
+    var lutImage: UIImage?
+    var resultImage: UIImage?
+    
     lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         
@@ -18,29 +15,81 @@ class FilterViewController: UIViewController {
         return imageView
     }()
     
+    lazy var originalButton: UIButton = {
+        let button = UIButton(type: .system)
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(originalButtonLongPressed(_:)))
+        
+        button.setImage(UIImage(systemName: "photo"), for: .normal)
+        button.tintColor = .black
+        button.addGestureRecognizer(longPressGestureRecognizer)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        return button
+    }()
+    
+    lazy var saveButton: UIButton = {
+        let button = UIButton(type: .system)
+        
+        button.setImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
+        button.tintColor = .black
+        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         initializeUI()
-        
-        guard let srcImage = UIImage(named: "frogImage") else { return }
-        guard let lutImage = UIImage(named: "fujiFilm") else { return }
-        
-        if let resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage) {
-            imageView.image = resultImage
-            view.addSubview(imageView)
-        } else {
-            print("Failed to apply LUT to the source image.")
-        }
+        applyLUT()
     }
     
     private func initializeUI() {
         view.addSubview(imageView)
+        view.addSubview(originalButton)
+        view.addSubview(saveButton)
         
         NSLayoutConstraint.activate([
-            imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            originalButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            originalButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            originalButton.widthAnchor.constraint(equalToConstant: 50),
+            originalButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            saveButton.widthAnchor.constraint(equalToConstant: 50),
+            saveButton.heightAnchor.constraint(equalToConstant: 50),
+            
+            imageView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 150),
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            imageView.heightAnchor.constraint(equalToConstant: 250)
+            imageView.heightAnchor.constraint(equalToConstant: 250),
         ])
     }
+    
+    private func applyLUT() {
+        srcImage = UIImage(named: "frogImage")
+        lutImage = UIImage(named: "fujiFilm")
+        
+        guard let srcImage = srcImage, let lutImage = lutImage else { return }
+        
+        resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage)
+        imageView.image = resultImage
+    }
+    
+    @objc private func originalButtonLongPressed(_ sender: UILongPressGestureRecognizer) {
+        guard let srcImage = srcImage, let resultImage = resultImage else { return }
+
+        if sender.state == .began {
+            imageView.image = srcImage
+        } else if sender.state == .ended {
+            imageView.image = resultImage
+        }
+    }
+    
+//    @objc private func saveImage() {
+//        guard let resultImage = imageView.image else { return }
+//        UIImageWriteToSavedPhotosAlbum(resultImage, nil, nil, nil)
+//    }
 }
