@@ -15,9 +15,9 @@ class FilterViewController: UIViewController {
         return imageView
     }()
     
-    lazy var originalButton: UIButton = {
+    lazy var comparisonButton: UIButton = {
         let button = UIButton(type: .system)
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(originalButtonLongPressed(_:)))
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(comparisonButtonLongPressed(_:)))
         
         button.setImage(UIImage(systemName: "photo"), for: .normal)
         button.tintColor = .black
@@ -32,7 +32,7 @@ class FilterViewController: UIViewController {
         
         button.setImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
         button.tintColor = .black
-        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
+//        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -47,14 +47,14 @@ class FilterViewController: UIViewController {
     
     private func initializeUI() {
         view.addSubview(imageView)
-        view.addSubview(originalButton)
+        view.addSubview(comparisonButton)
         view.addSubview(saveButton)
         
         NSLayoutConstraint.activate([
-            originalButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            originalButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            originalButton.widthAnchor.constraint(equalToConstant: 50),
-            originalButton.heightAnchor.constraint(equalToConstant: 50),
+            comparisonButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            comparisonButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            comparisonButton.widthAnchor.constraint(equalToConstant: 50),
+            comparisonButton.heightAnchor.constraint(equalToConstant: 50),
             
             saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -78,7 +78,7 @@ class FilterViewController: UIViewController {
         imageView.image = resultImage
     }
     
-    @objc private func originalButtonLongPressed(_ sender: UILongPressGestureRecognizer) {
+    @objc private func comparisonButtonLongPressed(_ sender: UILongPressGestureRecognizer) {
         guard let srcImage = srcImage, let resultImage = resultImage else { return }
 
         if sender.state == .began {
