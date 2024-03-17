@@ -1,4 +1,5 @@
 import UIKit
+import Photos
 
 class FilterViewController: UIViewController {
     var srcImage: UIImage?
@@ -32,7 +33,7 @@ class FilterViewController: UIViewController {
         
         button.setImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
         button.tintColor = .black
-//        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
+        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -78,9 +79,18 @@ class FilterViewController: UIViewController {
         imageView.image = resultImage
     }
     
+    // 앨범 권한 체크
+    private func checkPhotoPermission() {
+        if #available(iOS 14, *) {
+            PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        } else {
+            PHPhotoLibrary.authorizationStatus()
+        }
+    }
+    
     @objc private func comparisonButtonLongPressed(_ sender: UILongPressGestureRecognizer) {
         guard let srcImage = srcImage, let resultImage = resultImage else { return }
-
+        
         if sender.state == .began {
             imageView.image = srcImage
         } else if sender.state == .ended {
@@ -88,8 +98,27 @@ class FilterViewController: UIViewController {
         }
     }
     
-//    @objc private func saveImage() {
-//        guard let resultImage = imageView.image else { return }
-//        UIImageWriteToSavedPhotosAlbum(resultImage, nil, nil, nil)
-//    }
+    @objc private func saveImage() {
+        guard let resultImage = imageView.image else { return }
+        
+        checkPhotoPermission()
+        UIImageWriteToSavedPhotosAlbum(resultImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+
+    @objc private func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
+        var message: String
+        if error != nil {
+            message = "이미지 저장을 원하시면 설정에서 사진 접근을 허용하세요."
+        } else {
+            message = "이미지 저장 완료"
+        }
+        let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        
+        // alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+        present(alert, animated: true) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                alert.dismiss(animated: true, completion: nil)
+            }
+        }
+    }
 }
