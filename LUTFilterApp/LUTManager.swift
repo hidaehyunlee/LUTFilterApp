@@ -1,7 +1,7 @@
 import UIKit
 
 class LUTManager {
-    static func applyLUT(image: UIImage, lut: UIImage) -> UIImage? {
+    static func applyLUT(image: UIImage, lut: UIImage, intensity: CGFloat) -> UIImage? {
         guard let imageData = image.cgImage else { return nil }
         guard let lutData = lut.cgImage else { return nil }
 
@@ -28,6 +28,14 @@ class LUTManager {
                                    bytesPerRow: 0,
                                    space: lutColorSpace,
                                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+        let outputContext = CGContext(data: nil,
+                                              width: imageWidth,
+                                              height: imageHeight,
+                                              bitsPerComponent: 8,
+                                              bytesPerRow: 0,
+                                              space: imageColorSpace,
+                                              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
+
         
         imageContext?.draw(imageData, in: CGRect(x: 0, y: 0, width: imageWidth, height: imageHeight))
         lutContext?.draw(lutData, in: CGRect(x: 0, y: 0, width: lutWidth, height: lutHeight))
@@ -35,28 +43,37 @@ class LUTManager {
         // 2. 이미지와 LUT의 픽셀 데이터 가져오기
         guard let imagePixelData = imageContext?.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
         guard let lutPixelData = lutContext?.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
+        guard let outputPixelData = outputContext?.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
+        
+        // 3. 블렌딩
+        let lutBlendFactor = min(max(intensity, 0.0), 1.0) // 0~1로 제한
+        let opacity = 1.0 - lutBlendFactor
 
-        // 3. LUT 적용
+        // 4. LUT 적용
         for y in 0 ..< imageHeight {
             for x in 0 ..< imageWidth {
                 let i = (y * imageWidth + x) * 4
-                let r = Int(imagePixelData[i]) / 4
-                let g = Int(imagePixelData[i + 1]) / 4
-                let b = Int(imagePixelData[i + 2]) / 4
-
-                let lutIndex = getLUTIndex(red: r, green: g, blue: b, lutWidth: lutWidth)
+                let lutIndex = getLUTIndex(red: Int(imagePixelData[i] / 4),
+                                           green: Int(imagePixelData[i + 1] / 4),
+                                           blue: Int(imagePixelData[i + 2] / 4),
+                                           lutWidth: lutWidth)
 
                 let lutR = lutPixelData[lutIndex]
                 let lutG = lutPixelData[lutIndex + 1]
                 let lutB = lutPixelData[lutIndex + 2]
-
+                
                 imagePixelData[i] = lutR
                 imagePixelData[i + 1] = lutG
                 imagePixelData[i + 2] = lutB
+
+//                outputPixelData[i] = UInt8(lutBlendFactor * CGFloat(lutR) + opacity * CGFloat(imagePixelData[i]))
+//                outputPixelData[i + 1] = UInt8(lutBlendFactor * CGFloat(lutG) + opacity * CGFloat(imagePixelData[i + 1]))
+//                outputPixelData[i + 2] = UInt8(lutBlendFactor * CGFloat(lutB) + opacity * CGFloat(imagePixelData[i + 2]))
+//                outputPixelData[i + 3] = imagePixelData[i + 3]
             }
         }
 
-        // 4. 이미지 컨텍스트를 이미지로 변환하여 반환
+        // 5. 이미지 컨텍스트를 이미지로 변환
         guard let outputCGImage = imageContext?.makeImage() else { return nil }
         let outputImage = UIImage(cgImage: outputCGImage)
 
