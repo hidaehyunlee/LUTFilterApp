@@ -21,7 +21,7 @@ class LUTManager {
                                      bytesPerRow: 0,
                                      space: imageColorSpace,
                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        let lutContext = CGContext(data: nil, 
+        let lutContext = CGContext(data: nil,
                                    width: lutWidth,
                                    height: lutHeight,
                                    bitsPerComponent: 8,
@@ -44,14 +44,29 @@ class LUTManager {
         for y in 0 ..< imageHeight {
             for x in 0 ..< imageWidth {
                 let i = (y * imageWidth + x) * 4
-                let lutIndex = getLUTIndex(red: Int(imagePixelData[i] / 4),
-                                           green: Int(imagePixelData[i + 1] / 4),
-                                           blue: Int(imagePixelData[i + 2] / 4),
-                                           lutWidth: lutWidth)
+                let r = CGFloat(imagePixelData[i] / 4)
+                let g = CGFloat(imagePixelData[i + 1] / 4)
+                let b = CGFloat(imagePixelData[i + 2] / 4)
+                
+                let floorLutIndex = getLUTIndex(red: Int(r), green: Int(g), blue: Int(b), lutWidth: lutWidth)
+                let ceilLutIndex = floorLutIndex + 4
+                // !!! 문제가 있는 부분. 올림이 제대로 안되고 있고, 보간이 필요하지 않은 부분들도 모두 다 보간하고 있음
+                // 예를 들면 올림하고 내림한 인덱스가 같을 때는 보간이 필요 없음 + 4의 배수인 애들은 보간이 필요 없음
 
-                let lutR = lutPixelData[lutIndex]
-                let lutG = lutPixelData[lutIndex + 1]
-                let lutB = lutPixelData[lutIndex + 2]
+                let floorLutPixelR = lutPixelData[floorLutIndex]
+                let ceilLutPixelR = lutPixelData[ceilLutIndex]
+                
+                let lutR = linearInterpolation(color1: CGFloat(floorLutPixelR), color2: CGFloat(ceilLutPixelR), t: r.truncatingRemainder(dividingBy: 1))
+
+                let floorLutPixelG = lutPixelData[floorLutIndex + 1]
+                let ceilLutPixelG = lutPixelData[ceilLutIndex + 1]
+                
+                let lutG = linearInterpolation(color1: CGFloat(floorLutPixelG), color2: CGFloat(ceilLutPixelG), t: g.truncatingRemainder(dividingBy: 1))
+                
+                let floorLutPixelB = lutPixelData[floorLutIndex + 2]
+                let ceilLutPixelB = lutPixelData[ceilLutIndex + 2]
+                
+                let lutB = linearInterpolation(color1: CGFloat(floorLutPixelB), color2: CGFloat(ceilLutPixelB), t: b.truncatingRemainder(dividingBy: 1))
                 
                 imagePixelData[i] = UInt8(lutBlendFactor * CGFloat(lutR) + opacity * CGFloat(imagePixelData[i]))
                 imagePixelData[i + 1] = UInt8(lutBlendFactor * CGFloat(lutG) + opacity * CGFloat(imagePixelData[i + 1]))
@@ -67,10 +82,14 @@ class LUTManager {
     }
 
     private static func getLUTIndex(red: Int, green: Int, blue: Int, lutWidth: Int) -> Int {
-        let blueIndex = (blue / 8) * (64 * 64 * 8)
-        let greenIndex = green * (8 * 64)
-        let redIndex = ((blue % 8) * 64) + red
+        let blueIndex = (blue / 4) * (64 * 64 * 4)
+        let greenIndex = green * (64 * 4)
+        let redIndex = (blue % 4) * 64 + red
         
         return (blueIndex + greenIndex + redIndex) * 4
+    }
+    
+    private static func linearInterpolation(color1: CGFloat, color2: CGFloat, t: CGFloat) -> CGFloat {
+        return color1 * (1 - t) + color2 * t
     }
 }
