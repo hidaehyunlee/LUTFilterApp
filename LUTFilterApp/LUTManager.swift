@@ -28,22 +28,13 @@ class LUTManager {
                                    bytesPerRow: 0,
                                    space: lutColorSpace,
                                    bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
-        let outputContext = CGContext(data: nil,
-                                              width: imageWidth,
-                                              height: imageHeight,
-                                              bitsPerComponent: 8,
-                                              bytesPerRow: 0,
-                                              space: imageColorSpace,
-                                              bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)
 
-        
         imageContext?.draw(imageData, in: CGRect(x: 0, y: 0, width: imageWidth, height: imageHeight))
         lutContext?.draw(lutData, in: CGRect(x: 0, y: 0, width: lutWidth, height: lutHeight))
 
         // 2. 이미지와 LUT의 픽셀 데이터 가져오기
         guard let imagePixelData = imageContext?.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
         guard let lutPixelData = lutContext?.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
-        guard let outputPixelData = outputContext?.data?.assumingMemoryBound(to: UInt8.self) else { return nil }
         
         // 3. 블렌딩
         let lutBlendFactor = min(max(intensity, 0.0), 1.0) // 0~1로 제한
@@ -62,14 +53,9 @@ class LUTManager {
                 let lutG = lutPixelData[lutIndex + 1]
                 let lutB = lutPixelData[lutIndex + 2]
                 
-                imagePixelData[i] = lutR
-                imagePixelData[i + 1] = lutG
-                imagePixelData[i + 2] = lutB
-
-//                outputPixelData[i] = UInt8(lutBlendFactor * CGFloat(lutR) + opacity * CGFloat(imagePixelData[i]))
-//                outputPixelData[i + 1] = UInt8(lutBlendFactor * CGFloat(lutG) + opacity * CGFloat(imagePixelData[i + 1]))
-//                outputPixelData[i + 2] = UInt8(lutBlendFactor * CGFloat(lutB) + opacity * CGFloat(imagePixelData[i + 2]))
-//                outputPixelData[i + 3] = imagePixelData[i + 3]
+                imagePixelData[i] = UInt8(lutBlendFactor * CGFloat(lutR) + opacity * CGFloat(imagePixelData[i]))
+                imagePixelData[i + 1] = UInt8(lutBlendFactor * CGFloat(lutG) + opacity * CGFloat(imagePixelData[i + 1]))
+                imagePixelData[i + 2] = UInt8(lutBlendFactor * CGFloat(lutB) + opacity * CGFloat(imagePixelData[i + 2]))
             }
         }
 

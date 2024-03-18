@@ -39,7 +39,7 @@ class FilterViewController: UIViewController {
         return button
     }()
     
-    lazy var slider: UISlider = {
+    lazy var opacitySlider: UISlider = {
         let slider = UISlider()
         
         slider.minimumValue = 0.0
@@ -62,7 +62,7 @@ class FilterViewController: UIViewController {
         view.addSubview(imageView)
         view.addSubview(comparisonButton)
         view.addSubview(saveButton)
-        view.addSubview(slider)
+        view.addSubview(opacitySlider)
         
         NSLayoutConstraint.activate([
             comparisonButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -80,9 +80,9 @@ class FilterViewController: UIViewController {
             imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             imageView.heightAnchor.constraint(equalToConstant: 250),
             
-            slider.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
-            slider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            slider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
+            opacitySlider.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+            opacitySlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            opacitySlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])
     }
     
@@ -143,7 +143,6 @@ class FilterViewController: UIViewController {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         let intensity = CGFloat(sender.value)
         
-        print(intensity)
         resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity)
         imageView.image = resultImage
     }
