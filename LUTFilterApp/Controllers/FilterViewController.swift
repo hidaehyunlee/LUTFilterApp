@@ -24,16 +24,18 @@ class FilterViewController: UIViewController {
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
+        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(imageViewLongPressed(_:)))
+        imageView.addGestureRecognizer(longPressGestureRecognizer)
+        imageView.isUserInteractionEnabled = true // 이미지뷰 위에 사진 올라가있을 때 사용 -> 사용자 이벤트가 이미지뷰를 통과
+
         return imageView
     }()
     
     lazy var comparisonButton: UIButton = {
         let button = UIButton(type: .system)
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(comparisonButtonLongPressed(_:)))
         
         button.setImage(UIImage(systemName: "photo"), for: .normal)
         button.tintColor = .black
-        button.addGestureRecognizer(longPressGestureRecognizer)
         button.translatesAutoresizingMaskIntoConstraints = false
         
         return button
@@ -56,7 +58,6 @@ class FilterViewController: UIViewController {
         slider.minimumValue = 0.0
         slider.maximumValue = 100.0
         slider.value = 60.0
-        slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
         slider.translatesAutoresizingMaskIntoConstraints = false
         
         if let thumbImage = UIImage(systemName: "circle.fill")?.withTintColor(UIColor.black).withRenderingMode(.alwaysOriginal) {
@@ -64,12 +65,13 @@ class FilterViewController: UIViewController {
             }        
         slider.minimumTrackTintColor = UIColor.black.withAlphaComponent(0.7)
         slider.maximumTrackTintColor = UIColor.lightGray.withAlphaComponent(0.4)
+        slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
         slider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
 
         return slider
     }()
     
-    lazy var opacityLabel: UILabel = {
+    lazy var infoLabel: UILabel = {
         let label = UILabel()
         
         label.textColor = .black
@@ -95,7 +97,7 @@ class FilterViewController: UIViewController {
         view.addSubview(comparisonButton)
         view.addSubview(saveButton)
         view.addSubview(opacitySlider)
-        view.addSubview(opacityLabel)
+        view.addSubview(infoLabel)
         
         NSLayoutConstraint.activate([
             viewLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 15),
@@ -120,8 +122,8 @@ class FilterViewController: UIViewController {
             opacitySlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 30),
             opacitySlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -30),
             
-            opacityLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
-            opacityLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            infoLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
+            infoLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
     
@@ -144,14 +146,22 @@ class FilterViewController: UIViewController {
         }
     }
     
-    @objc private func comparisonButtonLongPressed(_ sender: UILongPressGestureRecognizer) {
+    @objc private func imageViewLongPressed(_ sender: UILongPressGestureRecognizer) {
         guard let srcImage = srcImage, let resultImage = resultImage else { return }
         
         if sender.state == .began {
             imageView.image = srcImage
+            infoLabel.text = "원본"
+            infoLabel.isHidden = false
         } else if sender.state == .ended {
             imageView.image = resultImage
+            infoLabel.text = ""
+            infoLabel.isHidden = true
         }
+    }
+    
+    @objc private func imageViewTouchUp(_ sender: UISlider) {
+        infoLabel.isHidden = true
     }
     
     @objc private func saveImage() {
@@ -181,14 +191,14 @@ class FilterViewController: UIViewController {
     @objc private func sliderValueChanged(_ sender: UISlider) {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         let intensity = CGFloat(sender.value)
-        opacityLabel.text = "강도 +\(Int(intensity))"
-        opacityLabel.isHidden = false
+        infoLabel.text = "강도 +\(Int(intensity))"
+        infoLabel.isHidden = false
 
         resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity / 100)
         imageView.image = resultImage
     }
     
     @objc private func sliderTouchUp(_ sender: UISlider) {
-        opacityLabel.isHidden = true
+        infoLabel.isHidden = true
     }
 }
