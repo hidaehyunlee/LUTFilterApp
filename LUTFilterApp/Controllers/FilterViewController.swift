@@ -113,7 +113,7 @@ class FilterViewController: UIViewController {
             saveButton.widthAnchor.constraint(equalToConstant: 50),
             saveButton.heightAnchor.constraint(equalToConstant: 50),
             
-            imageView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 20),
+            imageView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 15),
             imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             imageView.heightAnchor.constraint(equalToConstant: 600),
@@ -213,11 +213,15 @@ class FilterViewController: UIViewController {
 
 extension FilterViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        self.opacitySlider.value = 60.0
         picker.dismiss(animated: true, completion: nil)
         
         if let pickedImage = info[.originalImage] as? UIImage {
             self.srcImage = pickedImage.rotate(radians: 0)
-            self.imageView.image = self.srcImage
+
+            guard let srcImage = self.srcImage, let lutImage = self.lutImage else { return }
+            let resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: CGFloat(self.opacitySlider.value) / 100)
+            self.imageView.image = resultImage
         }
     }
 }
