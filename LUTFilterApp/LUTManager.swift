@@ -47,9 +47,6 @@ class LUTManager {
                 var r = CGFloat(imagePixelData[i]) / 4.0 // int
                 var g = CGFloat(imagePixelData[i + 1]) / 4.0
                 var b = CGFloat(imagePixelData[i + 2]) / 4.0
-                if y == Int(imageHeight / 2) - 100 && x == Int(imageWidth / 2) {
-                    NSLog("r : \(r) g : \(g) b : \(b)")
-                }
                 
                 let overflowNum = 63.0
                 if r >= overflowNum || g >= overflowNum || b >= overflowNum {
@@ -66,24 +63,17 @@ class LUTManager {
                 let lutB: CGFloat
                 
                 if floorLutIndex == ceilLutIndex {
-                    if y == Int(imageHeight / 2) - 100 && x == Int(imageWidth / 2) {
-                        NSLog("1")
-                    }
                     // 보간 필요 X
                     lutR = CGFloat(lutPixelData[floorLutIndex])
                     lutG = CGFloat(lutPixelData[floorLutIndex + 1])
                     lutB = CGFloat(lutPixelData[floorLutIndex + 2])
                 } else {
-                    if y == Int(imageHeight / 2) - 100 && x == Int(imageWidth / 2) {
-                        NSLog("2")
-                    }
-                    
                     let floorLutPixelR = lutPixelData[floorLutIndex]
                     let ceilLutPixelR = lutPixelData[ceilLutIndex]
                     lutR = linearInterpolation(color1: CGFloat(floorLutPixelR), color2: CGFloat(ceilLutPixelR), t: r.truncatingRemainder(dividingBy: 1.0))
-                    if y == Int(imageHeight / 2) - 100 && x == Int(imageWidth / 2) {
-                        NSLog("2 : \(floorLutPixelR) / \(ceilLutPixelR) / \(lutR)")
-                    }
+//                    if y == 1 && x == 1 {
+//                        NSLog("보간 : floorLutPixelR: \(floorLutPixelR), ceilLutPixelR: \(ceilLutPixelR), lutR: \(lutR)")
+//                    }
                     let floorLutPixelG = lutPixelData[floorLutIndex + 1]
                     let ceilLutPixelG = lutPixelData[ceilLutIndex + 1]
                     lutG = linearInterpolation(color1: CGFloat(floorLutPixelG), color2: CGFloat(ceilLutPixelG), t: g.truncatingRemainder(dividingBy: 1.0))

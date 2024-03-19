@@ -6,10 +6,21 @@ class FilterViewController: UIViewController {
     var lutImage: UIImage?
     var resultImage: UIImage?
     
+    lazy var viewLabel: UILabel = {
+        let label = UILabel()
+        
+        label.text = "필터"
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
+    
     lazy var imageView: UIImageView = {
         let imageView = UIImageView()
         
-        imageView.backgroundColor = .lightGray
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -38,18 +49,38 @@ class FilterViewController: UIViewController {
         
         return button
     }()
-    
+ 
     lazy var opacitySlider: UISlider = {
         let slider = UISlider()
         
         slider.minimumValue = 0.0
-        slider.maximumValue = 1.0
-        slider.value = 1.0
+        slider.maximumValue = 100.0
+        slider.value = 60.0
         slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
         slider.translatesAutoresizingMaskIntoConstraints = false
         
+        if let thumbImage = UIImage(systemName: "circle.fill")?.withTintColor(UIColor.black).withRenderingMode(.alwaysOriginal) {
+                slider.setThumbImage(thumbImage, for: .normal)
+            }        
+        slider.minimumTrackTintColor = UIColor.black.withAlphaComponent(0.7)
+        slider.maximumTrackTintColor = UIColor.lightGray.withAlphaComponent(0.4)
+        slider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
+
         return slider
     }()
+    
+    lazy var opacityLabel: UILabel = {
+        let label = UILabel()
+        
+        label.textColor = .black
+        label.font = UIFont.boldSystemFont(ofSize: 18)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.isHidden = true
+        
+        return label
+    }()
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,40 +90,48 @@ class FilterViewController: UIViewController {
     }
     
     private func initializeUI() {
+        view.addSubview(viewLabel)
         view.addSubview(imageView)
         view.addSubview(comparisonButton)
         view.addSubview(saveButton)
         view.addSubview(opacitySlider)
+        view.addSubview(opacityLabel)
         
         NSLayoutConstraint.activate([
-            comparisonButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            viewLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 15),
+            viewLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            
+            comparisonButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             comparisonButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             comparisonButton.widthAnchor.constraint(equalToConstant: 50),
             comparisonButton.heightAnchor.constraint(equalToConstant: 50),
             
-            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
             saveButton.widthAnchor.constraint(equalToConstant: 50),
             saveButton.heightAnchor.constraint(equalToConstant: 50),
             
-            imageView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 150),
-            imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            imageView.heightAnchor.constraint(equalToConstant: 250),
+            imageView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 20),
+            imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
+            imageView.heightAnchor.constraint(equalToConstant: 600),
             
-            opacitySlider.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
-            opacitySlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            opacitySlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20)
+            opacitySlider.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 30),
+            opacitySlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 30),
+            opacitySlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -30),
+            
+            opacityLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
+            opacityLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
         ])
     }
     
     private func applyLUT() {
-        srcImage = UIImage(named: "frogImage")
+        srcImage = UIImage(named: "suwon_1080")
         lutImage = UIImage(named: "fujiFilm")
         
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         
-        resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: 1.0)
+        resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: 0.6)
         imageView.image = resultImage
     }
     
@@ -142,8 +181,14 @@ class FilterViewController: UIViewController {
     @objc private func sliderValueChanged(_ sender: UISlider) {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         let intensity = CGFloat(sender.value)
-        
-        resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity)
+        opacityLabel.text = "강도 +\(Int(intensity))"
+        opacityLabel.isHidden = false
+
+        resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity / 100)
         imageView.image = resultImage
+    }
+    
+    @objc private func sliderTouchUp(_ sender: UISlider) {
+        opacityLabel.isHidden = true
     }
 }
