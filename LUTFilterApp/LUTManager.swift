@@ -117,4 +117,100 @@ class LUTManager {
     private static func linearInterpolation(color1: CGFloat, color2: CGFloat, t: CGFloat) -> CGFloat {
         return color1 * (1 - t) + color2 * t
     }
+    
+    
+    
+    //    private static func getPixelFromLut(lutPixels: [UInt8], index: Int) -> (red: UInt8, green: UInt8, blue: UInt8) {
+    //            let startIndex = index * 4
+    //
+    //            let red = lutPixels[startIndex]
+    //            let green = lutPixels[startIndex + 1]
+    //            let blue = lutPixels[startIndex + 2]
+    //
+    //            return (red, green, blue)
+    //        }
+    //
+    //    static func applyLUT(image: UIImage, lut: UIImage, intensity: CGFloat = 1) -> UIImage? {
+    //            guard let srcCGImage = image.cgImage, let lutCGImage = lut.cgImage else { return nil }
+    //
+    //            let width = srcCGImage.width
+    //            let height = srcCGImage.height
+    //
+    //            let lutSize = lutCGImage.width
+    //            let lutBytesPerPixel = 4
+    //            let lutBytesPerRow = lutBytesPerPixel * lutSize
+    //            var lutPixels = [UInt8](repeating: 0, count: lutSize * lutSize * lutBytesPerPixel)
+    //
+    //            guard let lutContext = CGContext(data: &lutPixels,
+    //                                             width: lutSize,
+    //                                             height: lutSize,
+    //                                             bitsPerComponent: 8,
+    //                                             bytesPerRow: lutBytesPerRow,
+    //                                             space: CGColorSpaceCreateDeviceRGB(),
+    //                                             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+    //                return nil
+    //            }
+    //
+    //            lutContext.draw(lutCGImage, in: CGRect(x: 0, y: 0, width: lutSize, height: lutSize))
+    //
+    //            var srcPixels = [UInt8](repeating: 0, count: width * height * 4)
+    //            guard let srcContext = CGContext(data: &srcPixels,
+    //                                             width: width,
+    //                                             height: height,
+    //                                             bitsPerComponent: 8,
+    //                                             bytesPerRow: width * 4,
+    //                                             space: CGColorSpaceCreateDeviceRGB(),
+    //                                             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else {
+    //                return nil
+    //            }
+    //
+    //            srcContext.draw(srcCGImage, in: CGRect(x: 0, y: 0, width: width, height: height))
+    //
+    //            var resultPixels = [UInt8](repeating: 0, count: width * height * 4)
+    //
+    //            for index in 0..<srcPixels.count / 4 {
+    //                let offset = index * 4
+    //                let r = Double(srcPixels[offset]) / 4.0
+    //                let g = Double(srcPixels[offset + 1]) / 4.0
+    //                let b = Double(srcPixels[offset + 2]) / 4.0
+    //
+    //                let floorLutIndex = getLUTIndex(red: floor(r), green: floor(g), blue: floor(b), lutWidth: lutSize)
+    //                let ceilLutIndex = getLUTIndex(red: ceil(r), green: ceil(g), blue: ceil(b), lutWidth: lutSize)
+    //
+    //                let floorLutPixel = getPixelFromLut(lutPixels: lutPixels, index: floorLutIndex)
+    //                let ceilLutPixel = getPixelFromLut(lutPixels: lutPixels, index: ceilLutIndex)
+    //
+    //                let outPutR = linearInterpolation(color1: floorLutPixel.red, color2: ceilLutPixel.red, t: r - floor(r))
+    //                let outPutG = linearInterpolation(color1: floorLutPixel.green, color2: ceilLutPixel.green, t: g - floor(g))
+    //                let outPutB = linearInterpolation(color1: floorLutPixel.blue, color2: ceilLutPixel.blue, t: b - floor(b))
+    //
+    //                resultPixels[offset] = outPutR
+    //                resultPixels[offset + 1] = outPutG
+    //                resultPixels[offset + 2] = outPutB
+    //                resultPixels[offset + 3] = 255 // Alpha value
+    //            }
+    //
+    //            guard let resultCGContext = CGContext(data: &resultPixels,
+    //                                                   width: width,
+    //                                                   height: height,
+    //                                                   bitsPerComponent: 8,
+    //                                                   bytesPerRow: width * 4,
+    //                                                   space: CGColorSpaceCreateDeviceRGB(),
+    //                                                   bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
+    //                let resultCGImage = resultCGContext.makeImage() else {
+    //                    return nil
+    //            }
+    //
+    //            let resultImage = UIImage(cgImage: resultCGImage)
+    //
+    //            return resultImage
+    //        }
+    
+    
+    //    private static func linearInterpolation(color1: UInt8, color2: UInt8, t: Double) -> UInt8 {
+    //        let ratio1 = 1.0 - t
+    //        let outputColor = Double(color1) * t + Double(color2) * t
+    //
+    //        return UInt8(outputColor.rounded())
+    //    }
 }
