@@ -75,7 +75,9 @@ class FilterViewController: UIViewController {
     lazy var infoLabel: UILabel = {
         let label = UILabel()
         
-        label.textColor = .black
+        label.textColor = .white
+        label.shadowColor = .black
+        label.shadowOffset = CGSize(width: 1, height: 1)
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -199,11 +201,23 @@ class FilterViewController: UIViewController {
     @objc private func sliderValueChanged(_ sender: UISlider) {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         let intensity = CGFloat(sender.value)
-        infoLabel.text = "강도 +\(Int(intensity))"
-        infoLabel.isHidden = false
+        var isProcessing: Bool = true
 
-        resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity / 100)
-        imageView.image = resultImage
+        OperationQueue().addOperation {
+            if isProcessing {
+                let processedImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity / 100)
+                
+                OperationQueue.main.addOperation { [self] in
+                    resultImage = processedImage
+                    imageView.image = self.resultImage
+                    
+                    infoLabel.text = "강도 +\(Int(intensity))"
+                    infoLabel.isHidden = false
+                    
+                    isProcessing = false
+                }
+            }
+        }
     }
     
     @objc private func sliderTouchUp(_ sender: UISlider) {
