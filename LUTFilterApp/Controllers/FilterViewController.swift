@@ -31,12 +31,13 @@ class FilterViewController: UIViewController {
         return imageView
     }()
     
-    lazy var comparisonButton: UIButton = {
+    lazy var galleryButton: UIButton = {
         let button = UIButton(type: .system)
         
         button.setImage(UIImage(systemName: "photo"), for: .normal)
         button.tintColor = .black
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(openGallery(_:)), for: .touchUpInside)
         
         return button
     }()
@@ -82,7 +83,6 @@ class FilterViewController: UIViewController {
         
         return label
     }()
-
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -94,7 +94,7 @@ class FilterViewController: UIViewController {
     private func initializeUI() {
         view.addSubview(viewLabel)
         view.addSubview(imageView)
-        view.addSubview(comparisonButton)
+        view.addSubview(galleryButton)
         view.addSubview(saveButton)
         view.addSubview(opacitySlider)
         view.addSubview(infoLabel)
@@ -103,10 +103,10 @@ class FilterViewController: UIViewController {
             viewLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 15),
             viewLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             
-            comparisonButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            comparisonButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            comparisonButton.widthAnchor.constraint(equalToConstant: 50),
-            comparisonButton.heightAnchor.constraint(equalToConstant: 50),
+            galleryButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
+            galleryButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
+            galleryButton.widthAnchor.constraint(equalToConstant: 50),
+            galleryButton.heightAnchor.constraint(equalToConstant: 50),
             
             saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
             saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
@@ -164,6 +164,14 @@ class FilterViewController: UIViewController {
         infoLabel.isHidden = true
     }
     
+    @objc func openGallery(_ sender: UIButton) {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.sourceType = .photoLibrary
+        imagePickerController.delegate = self
+        
+        present(imagePickerController, animated: true, completion: nil)
+    }
+    
     @objc private func saveImage() {
         guard let resultImage = imageView.image else { return }
         
@@ -200,5 +208,39 @@ class FilterViewController: UIViewController {
     
     @objc private func sliderTouchUp(_ sender: UISlider) {
         infoLabel.isHidden = true
+    }
+}
+
+extension FilterViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        
+        if let pickedImage = info[.originalImage] as? UIImage {
+            self.srcImage = pickedImage.rotate(radians: 0)
+            self.imageView.image = self.srcImage
+        }
+    }
+}
+
+extension UIImage {
+    func rotate(radians: Float) -> UIImage? {
+        var newSize = CGRect(origin: CGPoint.zero, size: self.size).applying(CGAffineTransform(rotationAngle: CGFloat(radians))).size
+        newSize.width = floor(newSize.width)
+        newSize.height = floor(newSize.height)
+
+        UIGraphicsBeginImageContextWithOptions(newSize, false, self.scale)
+        let context = UIGraphicsGetCurrentContext()!
+
+        // Move origin to middle
+        context.translateBy(x: newSize.width/2, y: newSize.height/2)
+        // Rotate around middle
+        context.rotate(by: CGFloat(radians))
+        // Draw the image at its center
+        self.draw(in: CGRect(x: -self.size.width/2, y: -self.size.height/2, width: self.size.width, height: self.size.height))
+
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
     }
 }
