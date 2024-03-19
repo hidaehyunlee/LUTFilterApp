@@ -129,7 +129,7 @@ class FilterViewController: UIViewController {
     
     private func applyLUT() {
         srcImage = UIImage(named: "suwon_1080")
-        lutImage = UIImage(named: "fujiFilm")
+        lutImage = UIImage(named: "greenS")
         
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         
