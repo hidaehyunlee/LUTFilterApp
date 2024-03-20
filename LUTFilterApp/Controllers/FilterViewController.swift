@@ -13,6 +13,11 @@ class FilterViewController: UIViewController {
         super.viewDidLoad()
         
         view.addSubview(filterView)
+        configUI()
+        applyLUT()
+    }
+    
+    private func configUI() {
         filterView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             filterView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -27,27 +32,16 @@ class FilterViewController: UIViewController {
         filterView.opacitySlider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
         filterView.imageView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(imageViewLongPressed(_:))))
         filterView.imageView.isUserInteractionEnabled = true
-
-        applyLUT()
     }
     
     private func applyLUT() {
         srcImage = UIImage(named: "suwon_1080")
-        lutImage = UIImage(named: "greenS")
+        lutImage = UIImage(named: "fujiFilm")
         
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         
         resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: 0.6)
         filterView.imageView.image = resultImage
-    }
-    
-    // 앨범 권한 체크
-    private func checkPhotoPermission() {
-        if #available(iOS 14, *) {
-            PHPhotoLibrary.authorizationStatus(for: .addOnly)
-        } else {
-            PHPhotoLibrary.authorizationStatus()
-        }
     }
     
     @objc private func imageViewLongPressed(_ sender: UILongPressGestureRecognizer) {
@@ -119,6 +113,14 @@ class FilterViewController: UIViewController {
     
     @objc private func sliderTouchUp(_ sender: UISlider) {
         filterView.infoLabel.isHidden = true
+    }
+    
+    private func checkPhotoPermission() {
+        if #available(iOS 14, *) {
+            PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        } else {
+            PHPhotoLibrary.authorizationStatus()
+        }
     }
 }
 
