@@ -47,6 +47,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		3653E2B02BAABD2500B2A765 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				DE3F42992BA37331007C88F1 /* LUTManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
 		36F52BFD2BA2F9F8004FB7C3 = {
 			isa = PBXGroup;
 			children = (
@@ -66,11 +74,11 @@
 		36F52C082BA2F9F8004FB7C3 /* LUTFilterApp */ = {
 			isa = PBXGroup;
 			children = (
+				3653E2B02BAABD2500B2A765 /* Managers */,
 				3653E2AD2BAAA95600B2A765 /* Views */,
 				36F52C1E2BA2FB7F004FB7C3 /* Resources */,
 				36F52C1D2BA2FB6D004FB7C3 /* Controllers */,
 				36F52C172BA2F9FB004FB7C3 /* Info.plist */,
-				DE3F42992BA37331007C88F1 /* LUTManager.swift */,
 			);
 			path = LUTFilterApp;
 			sourceTree = "<group>";
