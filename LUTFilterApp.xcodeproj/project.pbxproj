@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		3653E2AF2BAAA98000B2A765 /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3653E2AE2BAAA98000B2A765 /* FilterView.swift */; };
+		3653E2B62BAAEFE600B2A765 /* FilterViewController+FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3653E2B52BAAEFE600B2A765 /* FilterViewController+FilterView.swift */; };
+		3653E2B82BAAF03700B2A765 /* FilterViewController+ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3653E2B72BAAF03700B2A765 /* FilterViewController+ImagePicker.swift */; };
 		36F52C0A2BA2F9F8004FB7C3 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C092BA2F9F8004FB7C3 /* AppDelegate.swift */; };
 		36F52C0C2BA2F9F8004FB7C3 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C0B2BA2F9F8004FB7C3 /* SceneDelegate.swift */; };
 		36F52C0E2BA2F9F8004FB7C3 /* FilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F52C0D2BA2F9F8004FB7C3 /* FilterViewController.swift */; };
@@ -18,6 +20,8 @@
 
 /* Begin PBXFileReference section */
 		3653E2AE2BAAA98000B2A765 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
+		3653E2B52BAAEFE600B2A765 /* FilterViewController+FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FilterViewController+FilterView.swift"; sourceTree = "<group>"; };
+		3653E2B72BAAF03700B2A765 /* FilterViewController+ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FilterViewController+ImagePicker.swift"; sourceTree = "<group>"; };
 		36F52C062BA2F9F8004FB7C3 /* LUTFilterApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LUTFilterApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		36F52C092BA2F9F8004FB7C3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		36F52C0B2BA2F9F8004FB7C3 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -87,6 +91,8 @@
 			isa = PBXGroup;
 			children = (
 				36F52C0D2BA2F9F8004FB7C3 /* FilterViewController.swift */,
+				3653E2B52BAAEFE600B2A765 /* FilterViewController+FilterView.swift */,
+				3653E2B72BAAF03700B2A765 /* FilterViewController+ImagePicker.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -176,7 +182,9 @@
 				36F52C0A2BA2F9F8004FB7C3 /* AppDelegate.swift in Sources */,
 				36F52C0C2BA2F9F8004FB7C3 /* SceneDelegate.swift in Sources */,
 				3653E2AF2BAAA98000B2A765 /* FilterView.swift in Sources */,
+				3653E2B82BAAF03700B2A765 /* FilterViewController+ImagePicker.swift in Sources */,
 				DE3F429A2BA37331007C88F1 /* LUTManager.swift in Sources */,
+				3653E2B62BAAEFE600B2A765 /* FilterViewController+FilterView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
