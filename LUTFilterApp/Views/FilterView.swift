@@ -1,6 +1,15 @@
 import UIKit
 
+protocol FilterViewDelegate: AnyObject {
+    func galleryButtonEvent(_ filterView: FilterView, button: UIButton)
+    func saveButtonEvent(_ filterView: FilterView)
+    func opacitySliderEvent(_ filterView: FilterView, slider: UISlider)
+    func imageViewEvent(_ filterView: FilterView, gesture: UILongPressGestureRecognizer)
+}
+
 class FilterView: UIView {
+    weak var delegate: FilterViewDelegate?
+    
     lazy var viewLabel: UILabel = {
         let label = UILabel()
         
@@ -18,10 +27,9 @@ class FilterView: UIView {
         
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-
         imageView.isUserInteractionEnabled = true // 이미지뷰 위에 사진 올라가있을 때 사용 -> 사용자 이벤트가 이미지뷰를 통과
-
+        imageView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(imageViewLongPressed(_:))))
+        
         return imageView
     }()
     
@@ -31,6 +39,7 @@ class FilterView: UIView {
         button.setImage(UIImage(systemName: "photo"), for: .normal)
         button.tintColor = .black
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(openGallery(_:)), for: .touchUpInside)
         
         return button
     }()
@@ -41,7 +50,8 @@ class FilterView: UIView {
         button.setImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
         button.tintColor = .black
         button.translatesAutoresizingMaskIntoConstraints = false
-        
+        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
+
         return button
     }()
  
@@ -59,8 +69,8 @@ class FilterView: UIView {
         }
         slider.minimumTrackTintColor = UIColor.black.withAlphaComponent(0.7)
         slider.maximumTrackTintColor = UIColor.lightGray.withAlphaComponent(0.4)
-       
-
+        slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
+        slider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
 
         return slider
     }()
@@ -75,7 +85,7 @@ class FilterView: UIView {
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
         label.isHidden = true
-        
+
         return label
     }()
     
@@ -87,6 +97,26 @@ class FilterView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+        
+    @objc private func openGallery(_ sender: UIButton) {
+        delegate?.galleryButtonEvent(self, button: sender)
+    }
+    
+    @objc private func saveImage() {
+        delegate?.saveButtonEvent(self)
+    }
+    
+    @objc private func imageViewLongPressed(_ sender: UILongPressGestureRecognizer) {
+        delegate?.imageViewEvent(self, gesture: sender)
+    }
+    
+    @objc private func sliderValueChanged(_ sender: UISlider) {
+        delegate?.opacitySliderEvent(self, slider: sender)
+    }
+    
+    @objc private func sliderTouchUp(_ sender: UISlider) {
+        infoLabel.isHidden = true
     }
     
     private func initializeUI() {

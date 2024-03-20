@@ -5,6 +5,7 @@ class FilterViewController: UIViewController {
     var srcImage: UIImage?
     var lutImage: UIImage?
     var resultImage: UIImage?
+    
     private var isProcessing: Bool = false
     private let processingQueue = OperationQueue()
     private let filterView = FilterView()
@@ -13,25 +14,20 @@ class FilterViewController: UIViewController {
         super.viewDidLoad()
         
         view.addSubview(filterView)
+        filterView.delegate = self
         configUI()
         applyLUT()
     }
     
     private func configUI() {
         filterView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             filterView.topAnchor.constraint(equalTo: view.topAnchor),
             filterView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             filterView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             filterView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        
-        filterView.galleryButton.addTarget(self, action: #selector(openGallery(_:)), for: .touchUpInside)
-        filterView.saveButton.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
-        filterView.opacitySlider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
-        filterView.opacitySlider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
-        filterView.imageView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(imageViewLongPressed(_:))))
-        filterView.imageView.isUserInteractionEnabled = true
     }
     
     private func applyLUT() {
@@ -44,36 +40,15 @@ class FilterViewController: UIViewController {
         filterView.imageView.image = resultImage
     }
     
-    @objc private func imageViewLongPressed(_ sender: UILongPressGestureRecognizer) {
-        guard let srcImage = srcImage, let resultImage = resultImage else { return }
-        
-        if sender.state == .began {
-            filterView.imageView.image = srcImage
-            filterView.infoLabel.text = "원본"
-            filterView.infoLabel.isHidden = false
-        } else if sender.state == .ended {
-            filterView.imageView.image = resultImage
-            filterView.infoLabel.text = ""
-            filterView.infoLabel.isHidden = true
+    private func checkPhotoPermission() {
+        if #available(iOS 14, *) {
+            PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        } else {
+            PHPhotoLibrary.authorizationStatus()
         }
     }
     
-    @objc func openGallery(_ sender: UIButton) {
-        let imagePickerController = UIImagePickerController()
-        imagePickerController.sourceType = .photoLibrary
-        imagePickerController.delegate = self
-        
-        present(imagePickerController, animated: true, completion: nil)
-    }
-    
-    @objc private func saveImage() {
-        guard let resultImage = filterView.imageView.image else { return }
-        
-        checkPhotoPermission()
-        UIImageWriteToSavedPhotosAlbum(resultImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
-    }
-
-    @objc private func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
+    @objc private func imagePermissionAlert(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
         var message: String
         if error != nil {
             message = "이미지 저장을 원하시면 설정에서 사진 접근을 허용하세요."
@@ -82,17 +57,47 @@ class FilterViewController: UIViewController {
         }
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         
-        // alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
         present(alert, animated: true) {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                 alert.dismiss(animated: true, completion: nil)
             }
         }
     }
+}
+
+extension FilterViewController: FilterViewDelegate {
+    func galleryButtonEvent(_ filterView: FilterView, button: UIButton) {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.sourceType = .photoLibrary
+        imagePickerController.delegate = self
+        
+        present(imagePickerController, animated: true, completion: nil)
+    }
     
-    @objc private func sliderValueChanged(_ sender: UISlider) {
+    func saveButtonEvent(_ filterView: FilterView) {
+        guard let resultImage = filterView.imageView.image else { return }
+        
+        checkPhotoPermission()
+        UIImageWriteToSavedPhotosAlbum(resultImage, self, #selector(imagePermissionAlert(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    func imageViewEvent(_ filterView: FilterView, gesture: UILongPressGestureRecognizer) {
+        guard let srcImage = srcImage, let resultImage = resultImage else { return }
+        
+        if gesture.state == .began {
+            filterView.imageView.image = srcImage
+            filterView.infoLabel.text = "원본"
+            filterView.infoLabel.isHidden = false
+        } else if gesture.state == .ended {
+            filterView.imageView.image = resultImage
+            filterView.infoLabel.text = ""
+            filterView.infoLabel.isHidden = true
+        }
+    }
+    
+    func opacitySliderEvent(_ filterView: FilterView, slider: UISlider) {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
-        let intensity = CGFloat(sender.value)
+        let intensity = CGFloat(slider.value)
         
         filterView.infoLabel.text = "강도 +\(Int(intensity))"
         filterView.infoLabel.isHidden = false
@@ -108,18 +113,6 @@ class FilterViewController: UIViewController {
                 }
                 self.isProcessing = false
             }
-        }
-    }
-    
-    @objc private func sliderTouchUp(_ sender: UISlider) {
-        filterView.infoLabel.isHidden = true
-    }
-    
-    private func checkPhotoPermission() {
-        if #available(iOS 14, *) {
-            PHPhotoLibrary.authorizationStatus(for: .addOnly)
-        } else {
-            PHPhotoLibrary.authorizationStatus()
         }
     }
 }
