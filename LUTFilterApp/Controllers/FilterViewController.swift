@@ -7,130 +7,28 @@ class FilterViewController: UIViewController {
     var resultImage: UIImage?
     private var isProcessing: Bool = false
     private let processingQueue = OperationQueue()
-
-    lazy var viewLabel: UILabel = {
-        let label = UILabel()
-        
-        label.text = "필터"
-        label.textColor = .black
-        label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        return label
-    }()
-    
-    lazy var imageView: UIImageView = {
-        let imageView = UIImageView()
-        
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
-        let longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(imageViewLongPressed(_:)))
-        imageView.addGestureRecognizer(longPressGestureRecognizer)
-        imageView.isUserInteractionEnabled = true // 이미지뷰 위에 사진 올라가있을 때 사용 -> 사용자 이벤트가 이미지뷰를 통과
-
-        return imageView
-    }()
-    
-    lazy var galleryButton: UIButton = {
-        let button = UIButton(type: .system)
-        
-        button.setImage(UIImage(systemName: "photo"), for: .normal)
-        button.tintColor = .black
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(openGallery(_:)), for: .touchUpInside)
-        
-        return button
-    }()
-    
-    lazy var saveButton: UIButton = {
-        let button = UIButton(type: .system)
-        
-        button.setImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
-        button.tintColor = .black
-        button.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        
-        return button
-    }()
- 
-    lazy var opacitySlider: UISlider = {
-        let slider = UISlider()
-        
-        slider.minimumValue = 0.0
-        slider.maximumValue = 100.0
-        slider.value = 60.0
-        slider.translatesAutoresizingMaskIntoConstraints = false
-        
-        if let thumbImage = UIImage(systemName: "circle.fill") {
-            let renderdImage = thumbImage.withTintColor(UIColor.black).withRenderingMode(.alwaysOriginal)
-            slider.setThumbImage(renderdImage, for: .normal)
-        }
-        slider.minimumTrackTintColor = UIColor.black.withAlphaComponent(0.7)
-        slider.maximumTrackTintColor = UIColor.lightGray.withAlphaComponent(0.4)
-        slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
-        slider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
-
-
-        return slider
-    }()
-    
-    lazy var infoLabel: UILabel = {
-        let label = UILabel()
-        
-        label.textColor = .white
-        label.shadowColor = .black
-        label.shadowOffset = CGSize(width: 1, height: 1)
-        label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.isHidden = true
-        
-        return label
-    }()
+    private let filterView = FilterView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        initializeUI()
-        applyLUT()
-    }
-    
-    private func initializeUI() {
-        view.addSubview(viewLabel)
-        view.addSubview(imageView)
-        view.addSubview(galleryButton)
-        view.addSubview(saveButton)
-        view.addSubview(opacitySlider)
-        view.addSubview(infoLabel)
-        
+        view.addSubview(filterView)
+        filterView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            viewLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 15),
-            viewLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            
-            galleryButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            galleryButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            galleryButton.widthAnchor.constraint(equalToConstant: 50),
-            galleryButton.heightAnchor.constraint(equalToConstant: 50),
-            
-            saveButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0),
-            saveButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            saveButton.widthAnchor.constraint(equalToConstant: 50),
-            saveButton.heightAnchor.constraint(equalToConstant: 50),
-            
-            imageView.topAnchor.constraint(equalTo: saveButton.bottomAnchor, constant: 15),
-            imageView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            imageView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20),
-            imageView.heightAnchor.constraint(equalToConstant: 600),
-            
-            opacitySlider.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 30),
-            opacitySlider.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 30),
-            opacitySlider.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -30),
-            
-            infoLabel.bottomAnchor.constraint(equalTo: imageView.bottomAnchor, constant: -30),
-            infoLabel.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            filterView.topAnchor.constraint(equalTo: view.topAnchor),
+            filterView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            filterView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            filterView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        
+        filterView.galleryButton.addTarget(self, action: #selector(openGallery(_:)), for: .touchUpInside)
+        filterView.saveButton.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
+        filterView.opacitySlider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
+        filterView.opacitySlider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
+        filterView.imageView.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(imageViewLongPressed(_:))))
+        filterView.imageView.isUserInteractionEnabled = true
+
+        applyLUT()
     }
     
     private func applyLUT() {
@@ -140,7 +38,7 @@ class FilterViewController: UIViewController {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         
         resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: 0.6)
-        imageView.image = resultImage
+        filterView.imageView.image = resultImage
     }
     
     // 앨범 권한 체크
@@ -156,18 +54,14 @@ class FilterViewController: UIViewController {
         guard let srcImage = srcImage, let resultImage = resultImage else { return }
         
         if sender.state == .began {
-            imageView.image = srcImage
-            infoLabel.text = "원본"
-            infoLabel.isHidden = false
+            filterView.imageView.image = srcImage
+            filterView.infoLabel.text = "원본"
+            filterView.infoLabel.isHidden = false
         } else if sender.state == .ended {
-            imageView.image = resultImage
-            infoLabel.text = ""
-            infoLabel.isHidden = true
+            filterView.imageView.image = resultImage
+            filterView.infoLabel.text = ""
+            filterView.infoLabel.isHidden = true
         }
-    }
-    
-    @objc private func imageViewTouchUp(_ sender: UISlider) {
-        infoLabel.isHidden = true
     }
     
     @objc func openGallery(_ sender: UIButton) {
@@ -179,7 +73,7 @@ class FilterViewController: UIViewController {
     }
     
     @objc private func saveImage() {
-        guard let resultImage = imageView.image else { return }
+        guard let resultImage = filterView.imageView.image else { return }
         
         checkPhotoPermission()
         UIImageWriteToSavedPhotosAlbum(resultImage, self, #selector(image(_:didFinishSavingWithError:contextInfo:)), nil)
@@ -206,8 +100,8 @@ class FilterViewController: UIViewController {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         let intensity = CGFloat(sender.value)
         
-        self.infoLabel.text = "강도 +\(Int(intensity))"
-        self.infoLabel.isHidden = false
+        filterView.infoLabel.text = "강도 +\(Int(intensity))"
+        filterView.infoLabel.isHidden = false
         
         if !isProcessing {
             isProcessing = true
@@ -216,7 +110,7 @@ class FilterViewController: UIViewController {
                 
                 DispatchQueue.main.async {
                     self.resultImage = processedImage
-                    self.imageView.image = self.resultImage
+                    self.filterView.imageView.image = self.resultImage
                 }
                 self.isProcessing = false
             }
@@ -224,21 +118,21 @@ class FilterViewController: UIViewController {
     }
     
     @objc private func sliderTouchUp(_ sender: UISlider) {
-        infoLabel.isHidden = true
+        filterView.infoLabel.isHidden = true
     }
 }
 
 extension FilterViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        self.opacitySlider.value = 60.0
+        filterView.opacitySlider.value = 60.0
         picker.dismiss(animated: true, completion: nil)
         
         if let pickedImage = info[.originalImage] as? UIImage {
             self.srcImage = pickedImage.rotate(radians: 0)
 
             guard let srcImage = self.srcImage, let lutImage = self.lutImage else { return }
-            let resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: CGFloat(self.opacitySlider.value) / 100)
-            self.imageView.image = resultImage
+            let resultImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: CGFloat(filterView.opacitySlider.value) / 100)
+            filterView.imageView.image = resultImage
         }
     }
 }
