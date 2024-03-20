@@ -5,7 +5,9 @@ class FilterViewController: UIViewController {
     var srcImage: UIImage?
     var lutImage: UIImage?
     var resultImage: UIImage?
-    
+    private var isProcessing: Bool = false
+    private let processingQueue = OperationQueue()
+
     lazy var viewLabel: UILabel = {
         let label = UILabel()
         
@@ -61,13 +63,15 @@ class FilterViewController: UIViewController {
         slider.value = 60.0
         slider.translatesAutoresizingMaskIntoConstraints = false
         
-        if let thumbImage = UIImage(systemName: "circle.fill")?.withTintColor(UIColor.black).withRenderingMode(.alwaysOriginal) {
-                slider.setThumbImage(thumbImage, for: .normal)
-            }        
+        if let thumbImage = UIImage(systemName: "circle.fill") {
+            let renderdImage = thumbImage.withTintColor(UIColor.black).withRenderingMode(.alwaysOriginal)
+            slider.setThumbImage(renderdImage, for: .normal)
+        }
         slider.minimumTrackTintColor = UIColor.black.withAlphaComponent(0.7)
         slider.maximumTrackTintColor = UIColor.lightGray.withAlphaComponent(0.4)
         slider.addTarget(self, action: #selector(sliderValueChanged(_:)), for: .valueChanged)
         slider.addTarget(self, action: #selector(sliderTouchUp(_:)), for: .touchUpInside)
+
 
         return slider
     }()
@@ -201,21 +205,20 @@ class FilterViewController: UIViewController {
     @objc private func sliderValueChanged(_ sender: UISlider) {
         guard let srcImage = srcImage, let lutImage = lutImage else { return }
         let intensity = CGFloat(sender.value)
-        var isProcessing: Bool = true
-
-        OperationQueue().addOperation {
-            if isProcessing {
+        
+        self.infoLabel.text = "강도 +\(Int(intensity))"
+        self.infoLabel.isHidden = false
+        
+        if !isProcessing {
+            isProcessing = true
+            processingQueue.addOperation {
                 let processedImage = LUTManager.applyLUT(image: srcImage, lut: lutImage, intensity: intensity / 100)
                 
-                OperationQueue.main.addOperation { [self] in
-                    resultImage = processedImage
-                    imageView.image = self.resultImage
-                    
-                    infoLabel.text = "강도 +\(Int(intensity))"
-                    infoLabel.isHidden = false
-                    
-                    isProcessing = false
+                DispatchQueue.main.async {
+                    self.resultImage = processedImage
+                    self.imageView.image = self.resultImage
                 }
+                self.isProcessing = false
             }
         }
     }
